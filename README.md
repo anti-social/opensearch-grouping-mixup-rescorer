@@ -1,8 +1,8 @@
-[![Build](https://github.com/anti-social/elasticsearch-rescore-grouping-mixup/actions/workflows/java.yaml/badge.svg)](https://github.com/anti-social/elasticsearch-rescore-grouping-mixup/actions/workflows/java.yaml)
+[![Build](https://github.com/anti-social/opensearch-grouping-mixup-rescorer/actions/workflows/java.yaml/badge.svg)](https://github.com/anti-social/opensearch-grouping-mixup-rescorer/actions/workflows/java.yaml)
 
 # Grouping mixup rescorer
 
-This is a rescoring plugin for Elasticsearch that can mix up search results. For example you have
+This is a rescoring plugin for OpenSearch that can mix up search results. For example you have
 products from several companies and you want that one company couldn't displace the others.
 
 You can assemble plugin with gradle or vagga:
@@ -29,7 +29,7 @@ Or:
 vagga test
 ```
 
-To test the plugin with Elasticsearch run:
+To test the plugin with OpenSearch run:
 
 ```
 vagga elastic

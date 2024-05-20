@@ -1,11 +1,11 @@
 /*
- * Licensed to Elasticsearch under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,14 +17,16 @@
  * under the License.
  */
 
-package company.evo.elasticsearch.script;
+package company.evo.opensearch.script;
 
-import company.evo.elasticsearch.rescore.GroupingMixupRescorer;
+import company.evo.opensearch.rescore.GroupingMixupRescorer;
+
 import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.IndexSearcher;
 
-import org.elasticsearch.script.ScoreScript;
-import org.elasticsearch.search.lookup.SearchLookup;
-import org.elasticsearch.script.ScriptFactory;
+import org.opensearch.script.ScoreScript;
+import org.opensearch.script.ScriptFactory;
+import org.opensearch.search.lookup.SearchLookup;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,8 +41,16 @@ public class PositionRecipScript extends ScoreScript {
 
     private static final Map<String, Object> variables = new HashMap<>();
 
-    private PositionRecipScript(double m, double a, double b, double c, SearchLookup lookup, LeafReaderContext leafContext) {
-        super(Collections.emptyMap(), lookup, leafContext);
+    private PositionRecipScript(
+        double m,
+        double a,
+        double b,
+        double c,
+        SearchLookup lookup,
+        IndexSearcher indexSearcher,
+        LeafReaderContext leafContext
+    ) {
+        super(Collections.emptyMap(), lookup, indexSearcher, leafContext);
         this.m = m;
         this.a = a;
         this.b = b;
@@ -65,7 +75,9 @@ public class PositionRecipScript extends ScoreScript {
         }
 
         @Override
-        public LeafFactory newFactory(Map<String, Object> params, SearchLookup lookup) {
+        public LeafFactory newFactory(
+            Map<String, Object> params, SearchLookup lookup, IndexSearcher indexSearcher
+        ) {
             double m = params.containsKey("m") ? (Double) params.get("m") : 1.0;
             double a = params.containsKey("a") ? (Double) params.get("a") : 1.0;
             double b = params.containsKey("b") ? (Double) params.get("b") : 1.0;
@@ -74,7 +86,7 @@ public class PositionRecipScript extends ScoreScript {
             return new LeafFactory() {
                 @Override
                 public ScoreScript newInstance(LeafReaderContext context) {
-                    return new PositionRecipScript(m, a, b, c, lookup, context);
+                    return new PositionRecipScript(m, a, b, c, lookup, indexSearcher, context);
                 }
 
                 @Override

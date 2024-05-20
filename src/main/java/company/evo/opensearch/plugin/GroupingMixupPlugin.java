@@ -1,11 +1,12 @@
 /*
- * Licensed to Elasticsearch under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,17 +18,17 @@
  * under the License.
  */
 
-package company.evo.elasticsearch.plugin;
+package company.evo.opensearch.plugin;
 
-import company.evo.elasticsearch.rescore.GroupingMixupRescorerBuilder;
-import company.evo.elasticsearch.script.PositionRecipScriptEngine;
+import company.evo.opensearch.rescore.GroupingMixupRescorerBuilder;
+import company.evo.opensearch.script.PositionRecipScriptEngine;
 
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.plugins.Plugin;
-import org.elasticsearch.plugins.ScriptPlugin;
-import org.elasticsearch.plugins.SearchPlugin;
-import org.elasticsearch.script.ScriptContext;
-import org.elasticsearch.script.ScriptEngine;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.plugins.Plugin;
+import org.opensearch.plugins.ScriptPlugin;
+import org.opensearch.plugins.SearchPlugin;
+import org.opensearch.script.ScriptContext;
+import org.opensearch.script.ScriptEngine;
 
 import java.util.Collection;
 import java.util.List;

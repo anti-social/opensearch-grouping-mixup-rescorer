@@ -7,29 +7,29 @@ plugins {
     id("org.ajoberstar.grgit") version "4.1.0"
 }
 
-val defaultEsVersion = readVersion("es-default.version")
+val defaultOpensearchVersion = readVersion("opensearch-default.version")
 
-val gitDescribe = grgit.describe(mapOf("match" to listOf("v*-es*"), "tags" to true))
-    ?: "v0.0.0-es$defaultEsVersion"
+val gitDescribe = grgit.describe(mapOf("match" to listOf("v*-opensearch*"), "tags" to true))
+    ?: "v0.0.0-opensearch$defaultOpensearchVersion"
 
 class GitDescribe(val describe: String) {
     private val VERSION_REGEX = "[0-9]+\\.[0-9]+\\.[0-9]+(\\-(alpha|beta|rc)\\-[0-9]+)?"
 
     private val matchedGroups =
-        "v(?<plugin>${VERSION_REGEX})-es(?<es>${VERSION_REGEX})(-(?<abbrev>.*))?".toRegex()
+        "v(?<plugin>${VERSION_REGEX})-opensearch(?<opensearch>${VERSION_REGEX})(-(?<abbrev>.*))?".toRegex()
             .matchEntire(describe)!!
             .groups
 
     val plugin = matchedGroups["plugin"]!!.value
-    val es = matchedGroups["es"]!!.value
+    val opensearch = matchedGroups["opensearch"]!!.value
     val abbrev = matchedGroups["abbrev"]?.value
 
-    fun esVersion() = if (hasProperty("esVersion")) {
-        property("esVersion")
+    fun opensearchVersion() = if (hasProperty("opensearchVersion")) {
+        property("opensearchVersion")
     } else {
-        // When adopting to new Elasticsearch version
-        // create `buildSrc/es.version` file so IDE can fetch correct version of Elasticsearch
-        readVersion("es.version") ?: es
+        // When adopting to new OpenSearch version
+        // create `buildSrc/es.version` file so IDE can fetch correct version of OpenSearch
+        readVersion("opensearch.version") ?: opensearch
     }
 
     fun pluginVersion() = buildString {
@@ -40,7 +40,7 @@ class GitDescribe(val describe: String) {
     }
 
     fun projectVersion() = buildString {
-        append("$plugin-es${esVersion()}")
+        append("$plugin-opensearch${opensearchVersion()}")
         if (abbrev != null) {
             append("-$abbrev")
         }
@@ -63,10 +63,27 @@ tasks.create("generateVersionProperties") {
             put("tag", describe.describe)
             put("projectVersion", describe.projectVersion())
             put("pluginVersion", describe.pluginVersion())
-            put("esVersion", describe.esVersion())
+            put("opensearchVersion", describe.opensearchVersion())
         }
-        generatedResourcesDir.resolve("es-plugin-versions.properties").toFile().writer().use {
+        generatedResourcesDir.resolve("opensearch-plugin-versions.properties").toFile().writer().use {
             versionProps.store(it, null)
+        }
+    }
+}
+
+
+tasks.register("listRepos") {
+    doLast {
+        println("Repositories:")
+        project.repositories.forEach {
+            print("- ")
+            if (it is MavenArtifactRepository) {
+                println("Name: ${it.name}; url: ${it.url}")
+            } else if (it is IvyArtifactRepository) {
+                println("Name: ${it.name}; url: ${it.url}")
+            } else {
+                println("Unknown repository type: $it")
+            }
         }
     }
 }
@@ -85,7 +102,7 @@ idea {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32")
-    implementation("org.elasticsearch.gradle:build-tools:${describe.esVersion()}")
+    implementation("org.opensearch.gradle:build-tools:${describe.opensearchVersion()}")
 }
 
 // Utils
@@ -93,9 +110,9 @@ dependencies {
 fun readVersion(fileName: String): String? {
     project.projectDir.toPath().resolve(fileName).toFile().let {
         if (it.exists()) {
-            val esVersion = it.readText().trim()
-            if (!esVersion.startsWith('#')) {
-                return esVersion
+            val opensearchVersion = it.readText().trim()
+            if (!opensearchVersion.startsWith('#')) {
+                return opensearchVersion
             }
             return null
         }

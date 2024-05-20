@@ -1,11 +1,11 @@
 /*
- * Licensed to Elasticsearch under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package company.evo.elasticsearch.rescore;
+package company.evo.opensearch.rescore;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,11 +29,11 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
-import org.elasticsearch.index.fielddata.IndexFieldData;
-import org.elasticsearch.index.fielddata.SortedBinaryDocValues;
-import org.elasticsearch.script.ScoreScript;
-import org.elasticsearch.search.rescore.RescoreContext;
-import org.elasticsearch.search.rescore.Rescorer;
+import org.opensearch.index.fielddata.IndexFieldData;
+import org.opensearch.index.fielddata.SortedBinaryDocValues;
+import org.opensearch.script.ScoreScript;
+import org.opensearch.search.rescore.RescoreContext;
+import org.opensearch.search.rescore.Rescorer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -174,7 +174,7 @@ public class GroupingMixupRescorer implements Rescorer {
         float minRescoredScore = hits[windowSize - 1].score;
 
         // Decrease scores for hits that were not rescored.
-        // We must do that to satisfy elasticsearch's assertion
+        // We must do that to satisfy OpenSearch's assertion
         if (hits.length > windowSize) {
             float maxNonRescoredScore = hits[windowSize].score;
             float deltaScore = maxNonRescoredScore - minRescoredScore;

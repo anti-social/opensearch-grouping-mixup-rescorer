@@ -1,11 +1,11 @@
 /*
- * Licensed to Elasticsearch under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,43 +17,55 @@
  * under the License.
  */
 
-package company.evo.elasticsearch.rescore;
+package company.evo.opensearch.rescore;
+
+import company.evo.opensearch.plugin.GroupingMixupPlugin;
+
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.index.query.MatchAllQueryBuilder;
+import org.opensearch.index.query.MatchQueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.plugins.Plugin;
+import org.opensearch.script.Script;
+import org.opensearch.script.ScriptType;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
+import org.opensearch.test.OpenSearchIntegTestCase;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.test.ESIntegTestCase;
-
-import static org.elasticsearch.cluster.metadata.IndexMetadata.SETTING_NUMBER_OF_SHARDS;
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-import static org.elasticsearch.test.hamcrest.ElasticsearchAssertions.assertAcked;
-import static org.elasticsearch.test.hamcrest.ElasticsearchAssertions.assertHitCount;
-import static org.elasticsearch.test.hamcrest.ElasticsearchAssertions.assertOrderedSearchHits;
+import static org.opensearch.cluster.metadata.IndexMetadata.SETTING_NUMBER_OF_SHARDS;
+import static org.opensearch.common.xcontent.XContentFactory.jsonBuilder;
+import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertAcked;
+import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertHitCount;
+import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertOrderedSearchHits;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
-@ESIntegTestCase.ClusterScope(scope = ESIntegTestCase.Scope.SUITE)
-public class GroupingMixupRescorerIT extends ESIntegTestCase {
+@OpenSearchIntegTestCase.ClusterScope(scope = OpenSearchIntegTestCase.Scope.SUITE)
+public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
     private static final String DEBUG_SEP = "======================";
 
     private static final MatchQueryBuilder queryBuilder = QueryBuilders
             .matchQuery("name", "the quick brown");
 
+    @Override
+    protected Collection<Class<? extends Plugin>> nodePlugins() {
+        return Arrays.asList(
+            GroupingMixupPlugin.class
+        );
+    }
+
     public void testEmptyIndex() throws IOException {
         assertAcked(prepareCreate("test")
                 .setSettings(Settings.builder().put(SETTING_NUMBER_OF_SHARDS, 1))
-                .addMapping("product",
+                .setMapping(
                         jsonBuilder()
                         .startObject().startObject("product").startObject("properties")
                         .startObject("company_id")
@@ -243,7 +255,7 @@ public class GroupingMixupRescorerIT extends ESIntegTestCase {
     private void createIndexAndPopulateDocs() throws IOException {
         assertAcked(prepareCreate("test")
                 .setSettings(Settings.builder().put(SETTING_NUMBER_OF_SHARDS, 1))
-                .addMapping("product",
+                .setMapping(
                         jsonBuilder().startObject().startObject("product").startObject("properties")
                                 .startObject("name")
                                 .field("type", "text")
@@ -254,25 +266,29 @@ public class GroupingMixupRescorerIT extends ESIntegTestCase {
                                 .endObject()
                                 .endObject().endObject().endObject()));
 
-        client().prepareIndex("test", "product", "1")
+        client().prepareIndex("test")
+                .setId("1")
                 .setSource(
                         "name", "the quick brown fox",
                         "company_id", 1)
                 .execute()
                 .actionGet();
-        client().prepareIndex("test", "product", "2")
+        client().prepareIndex("test")
+                .setId("2")
                 .setSource(
                         "name", "the quick lazy huge fox jumps over the tree",
                         "company_id", 2)
                 .execute()
                 .actionGet();
-        client().prepareIndex("test", "product", "3")
+        client().prepareIndex("test")
+                .setId("3")
                 .setSource(
                         "name", "quick huge brown fox",
                         "company_id", 1)
                 .execute()
                 .actionGet();
-        client().prepareIndex("test", "product", "4")
+        client().prepareIndex("test")
+                .setId("4")
                 .setSource("name", "the quick lonely fox")
                 .execute()
                 .actionGet();

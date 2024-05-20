@@ -1,11 +1,11 @@
 /*
- * Licensed to Elasticsearch under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,22 +17,22 @@
  * under the License.
  */
 
-package company.evo.elasticsearch.rescore;
+package company.evo.opensearch.rescore;
 
-import org.elasticsearch.common.ParseField;
-import org.elasticsearch.common.ParsingException;
-import org.elasticsearch.common.io.stream.StreamInput;
-import org.elasticsearch.common.io.stream.StreamOutput;
-import org.elasticsearch.common.xcontent.ConstructingObjectParser;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentParser;
-import org.elasticsearch.index.fielddata.IndexFieldData;
-import org.elasticsearch.index.query.QueryRewriteContext;
-import org.elasticsearch.index.query.QueryShardContext;
-import org.elasticsearch.script.ScoreScript;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.search.rescore.RescoreContext;
-import org.elasticsearch.search.rescore.RescorerBuilder;
+import org.opensearch.core.ParseField;
+import org.opensearch.core.common.ParsingException;
+import org.opensearch.core.common.io.stream.StreamInput;
+import org.opensearch.core.common.io.stream.StreamOutput;
+import org.opensearch.core.xcontent.ConstructingObjectParser;
+import org.opensearch.core.xcontent.XContentBuilder;
+import org.opensearch.core.xcontent.XContentParser;
+import org.opensearch.index.fielddata.IndexFieldData;
+import org.opensearch.index.query.QueryRewriteContext;
+import org.opensearch.index.query.QueryShardContext;
+import org.opensearch.script.ScoreScript;
+import org.opensearch.script.Script;
+import org.opensearch.search.rescore.RescoreContext;
+import org.opensearch.search.rescore.RescorerBuilder;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -96,7 +96,7 @@ public class GroupingMixupRescorerBuilder extends RescorerBuilder<GroupingMixupR
         IndexFieldData<?> groupingField =
                 this.groupByField == null ? null : context.getForField(context.fieldMapper(this.groupByField));
         ScoreScript.LeafFactory scriptFactory = context.compile(rescoreScript, ScoreScript.CONTEXT)
-                .newFactory(rescoreScript.getParams(), context.lookup());
+                .newFactory(rescoreScript.getParams(), context.lookup(), context.searcher());
         return new GroupingMixupRescorer.Context(windowSize, groupingField, scriptFactory);
     }
 
