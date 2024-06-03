@@ -13,7 +13,7 @@ val gitDescribe = grgit.describe(mapOf("match" to listOf("v*-opensearch*"), "tag
     ?: "v0.0.0-opensearch$defaultOpensearchVersion"
 
 class GitDescribe(val describe: String) {
-    private val VERSION_REGEX = "[0-9]+\\.[0-9]+\\.[0-9]+(\\-(alpha|beta|rc)\\-[0-9]+)?"
+    private val VERSION_REGEX = "[0-9]+\\.[0-9]+\\.[0-9]+(\\-(alpha|beta|rc)[0-9]+)?"
 
     private val matchedGroups =
         "v(?<plugin>${VERSION_REGEX})-opensearch(?<opensearch>${VERSION_REGEX})(-(?<abbrev>.*))?".toRegex()
