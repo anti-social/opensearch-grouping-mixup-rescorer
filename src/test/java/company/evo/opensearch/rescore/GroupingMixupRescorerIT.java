@@ -34,11 +34,7 @@ import org.opensearch.search.SearchHits;
 import org.opensearch.test.OpenSearchIntegTestCase;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.opensearch.cluster.metadata.IndexMetadata.SETTING_NUMBER_OF_SHARDS;
 import static org.opensearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -57,8 +53,8 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
 
     @Override
     protected Collection<Class<? extends Plugin>> nodePlugins() {
-        return Arrays.asList(
-            GroupingMixupPlugin.class
+        return List.of(
+                GroupingMixupPlugin.class
         );
     }
 
@@ -304,7 +300,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
         float[] hitScores = new float[hits.length];
         for (int i = 0; i < scores.length; i++) {
             assertThat(
-                String.format("Different hit scores at position %s", i),
+                String.format(Locale.ROOT, "Different hit scores at position %s", i),
                 (double) hits[i].getScore(),
                 closeTo(scores[i], 1e-6)
             );

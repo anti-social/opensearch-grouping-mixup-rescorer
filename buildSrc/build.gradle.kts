@@ -4,7 +4,7 @@ import java.util.Properties
 plugins {
     `kotlin-dsl`
     idea
-    id("org.ajoberstar.grgit") version "4.1.0"
+    id("org.ajoberstar.grgit") version "4.1.1"
 }
 
 val defaultOpensearchVersion = readVersion("opensearch-default.version")
