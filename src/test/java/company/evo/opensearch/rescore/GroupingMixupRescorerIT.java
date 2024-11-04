@@ -63,11 +63,11 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
                 .setSettings(Settings.builder().put(SETTING_NUMBER_OF_SHARDS, 1))
                 .setMapping(
                         jsonBuilder()
-                        .startObject().startObject("product").startObject("properties")
+                        .startObject().startObject("properties")
                         .startObject("company_id")
                                 .field("type", "integer")
                         .endObject()
-                        .endObject().endObject().endObject()));
+                        .endObject().endObject()));
         ensureYellow();
         refresh();
 
@@ -252,7 +252,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
         assertAcked(prepareCreate("test")
                 .setSettings(Settings.builder().put(SETTING_NUMBER_OF_SHARDS, 1))
                 .setMapping(
-                        jsonBuilder().startObject().startObject("product").startObject("properties")
+                        jsonBuilder().startObject().startObject("properties")
                                 .startObject("name")
                                 .field("type", "text")
                                 .field("analyzer", "whitespace")
@@ -260,7 +260,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
                                 .startObject("company_id")
                                 .field("type", "integer")
                                 .endObject()
-                                .endObject().endObject().endObject()));
+                                .endObject().endObject()));
 
         client().prepareIndex("test")
                 .setId("1")
