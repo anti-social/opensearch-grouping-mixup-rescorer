@@ -80,7 +80,7 @@ public class GroupingMixupRescorer implements Rescorer {
             throws IOException
     {
         assert rescoreContext != null;
-        if (topDocs == null || topDocs.totalHits.value == 0 || topDocs.scoreDocs.length == 0) {
+        if (topDocs == null || topDocs.totalHits.value() == 0 || topDocs.scoreDocs.length == 0) {
             return topDocs;
         }
 

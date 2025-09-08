@@ -21,6 +21,8 @@ package company.evo.opensearch.rescore;
 
 import company.evo.opensearch.plugin.GroupingMixupPlugin;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.collection.ArrayMatching;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.index.query.MatchAllQueryBuilder;
@@ -35,6 +37,9 @@ import org.opensearch.test.OpenSearchIntegTestCase;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.DoubleStream;
 
 import static org.opensearch.cluster.metadata.IndexMetadata.SETTING_NUMBER_OF_SHARDS;
 import static org.opensearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -131,7 +136,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
         logger.info("{} {}", hits.getAt(3).getId(), hits.getAt(3).getScore());
         logger.info(DEBUG_SEP);
         assertOrderedSearchHits(resp, "1", "4", "2", "3");
-        assertOrderedSearchHitScores(resp, 1.2798426F, 0.51189536F, 0.48992145F, 0.44233876F);
+        assertOrderedSearchHitScores(resp, 0.5817465F, 0.2326796F, 0.2226915F, 0.2010630F);
     }
 
     public void testRescoringHitsAnotherOrder() throws IOException {
@@ -160,7 +165,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
         logger.info("{} {}", hits.getAt(3).getId(), hits.getAt(3).getScore());
         logger.info(DEBUG_SEP);
         assertOrderedSearchHits(resp, "3", "2", "4", "1");
-        assertOrderedSearchHitScores(resp, 1.0014079F, 0.6994759F, 0.2334607F, 0.11673035F);
+        assertOrderedSearchHitScores(resp, 0.45518538F, 0.31794363F, 0.10611849F, 0.053059246F);
     }
 
     public void testRescoringWithCustomScriptParams() throws IOException {
@@ -192,7 +197,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
         logger.info("{} {}", hits.getAt(3).getId(), hits.getAt(3).getScore());
         logger.info(DEBUG_SEP);
         assertOrderedSearchHits(resp, "1", "4", "3", "2");
-        assertOrderedSearchHitScores(resp, 1.2798425F, 0.5118953F, 0.50170016F, 0.4899214F);
+        assertOrderedSearchHitScores(resp, 0.5817465F, 0.23267967F, 0.22804551F, 0.22269154F);
     }
 
     public void testRescoringWithSmallSize() throws IOException {
@@ -218,7 +223,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
         logger.info("{} {}", hits.getAt(1).getId(), hits.getAt(1).getScore());
         logger.info(DEBUG_SEP);
         assertOrderedSearchHits(resp, "1", "4");
-        assertOrderedSearchHitScores(resp, 1.2798426F, 0.51189536F);
+        assertOrderedSearchHitScores(resp, 0.5817466F, 0.2326797F);
     }
 
     public void testRescoringWithSmallRescoreWindow() throws IOException {
@@ -245,7 +250,7 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
         logger.info("{} {}", hits.getAt(3).getId(), hits.getAt(3).getScore());
         logger.info(DEBUG_SEP);
         assertOrderedSearchHits(resp, "1", "4", "3", "2");
-        assertOrderedSearchHitScores(resp, 1.2798426F, 0.51189536F, 0.44233876F, 0.44233876F);
+        assertOrderedSearchHitScores(resp, 0.5817466F, 0.2326797F, 0.20106307F, 0.20106307F);
     }
 
     private void createIndexAndPopulateDocs() throws IOException {
@@ -293,17 +298,28 @@ public class GroupingMixupRescorerIT extends OpenSearchIntegTestCase {
     }
 
     public static void assertOrderedSearchHitScores(SearchResponse searchResponse, float... scores) {
-        SearchHit[] hits = searchResponse.getHits().getHits();
-        assertThat("Different hits length.",
-                hits.length, greaterThanOrEqualTo(scores.length));
+        final var hits = searchResponse.getHits().getHits();
+        assertThat(
+            "Different hits length",
+            hits.length,
+            greaterThanOrEqualTo(scores.length)
+        );
 
-        float[] hitScores = new float[hits.length];
-        for (int i = 0; i < scores.length; i++) {
-            assertThat(
-                String.format(Locale.ROOT, "Different hit scores at position %s", i),
-                (double) hits[i].getScore(),
-                closeTo(scores[i], 1e-6)
-            );
+        final var originHitScores = new float[hits.length];
+        final var hitScores = new Double[hits.length];
+        for (int i = 0; i < hitScores.length; i++) {
+            originHitScores[i] = hits[i].getScore();
+            hitScores[i] = Double.valueOf(hits[i].getScore());
         }
+        final List<Matcher<? super Double>> scoresMatchers = IntStream.range(0, scores.length)
+            .mapToDouble(i -> scores[i])
+            .boxed()
+            .map(s -> closeTo(s, 1e-6))
+            .collect(Collectors.toList());
+        assertThat(
+            String.format(Locale.ROOT, "Scores do not match: %s", Arrays.toString(originHitScores)),
+            hitScores,
+            ArrayMatching.arrayContaining(scoresMatchers)
+        );
     }
 }
