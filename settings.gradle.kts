@@ -1,1 +1,1 @@
-rootProject.name = "grouping-mixup-rescorer"
+rootProject.name = "opensearch-grouping-mixup-rescorer"

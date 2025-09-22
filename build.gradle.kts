@@ -12,7 +12,7 @@ configure<JavaPluginExtension> {
 }
 
 configureOpensearchPlugin(
-    name = "grouping-mixup-rescorer",
+    name = project.name,
     description = "Adds rescorer for mixing up search hits inside their groups",
     classname = "company.evo.opensearch.plugin.GroupingMixupPlugin",
     numberOfTestClusterNodes = 2,
